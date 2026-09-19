@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: radial-gradient(120% 60% at 50% 0%, #2a2730 0%, #16151a 60%, #121114 100%);
+}
+
+input,
+select {
+  color-scheme: dark;
+}

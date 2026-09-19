@@ -1,0 +1,33 @@
+{
+  "name": "life-progress-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "next": "14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "pg": "8.13.0",
+    "jsonwebtoken": "9.0.2",
+    "lucide-react": "0.454.0"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3",
+    "@types/node": "20.16.11",
+    "@types/react": "18.3.11",
+    "@types/react-dom": "18.3.1",
+    "@types/pg": "8.11.10",
+    "@types/jsonwebtoken": "9.0.7",
+    "tailwindcss": "3.4.14",
+    "postcss": "8.4.47",
+    "autoprefixer": "10.4.20",
+    "vitest": "2.1.3"
+  }
+}
