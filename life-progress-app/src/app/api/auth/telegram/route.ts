@@ -3,6 +3,7 @@ import { pool } from "@/lib/db";
 import { validateInitData } from "@/lib/telegramAuth";
 import { createSessionToken, sessionCookieOptions } from "@/lib/session";
 import { logEvent } from "@/lib/analytics";
+import { isValidTimezone } from "@/lib/date";
 
 export async function POST(req: NextRequest) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
   }
 
-  let body: { initData?: string };
+  let body: { initData?: string; timezone?: string };
   try {
     body = await req.json();
   } catch {
@@ -22,6 +23,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing initData" }, { status: 400 });
   }
 
+  // Client-detected IANA timezone (e.g. "Europe/Kyiv"). Optional — a missing or
+  // unrecognized value just falls back to the column default ('UTC') / whatever
+  // is already stored, rather than failing the whole login.
+  const timezone =
+    typeof body.timezone === "string" && isValidTimezone(body.timezone) ? body.timezone : null;
+
   // The whole point: we never trust a user object the frontend sends us directly —
   // only what we can verify came from Telegram via this HMAC check.
   const validated = validateInitData(initData, botToken);
@@ -32,14 +39,15 @@ export async function POST(req: NextRequest) {
   const { user: tgUser } = validated;
 
   const upsertResult = await pool.query(
-    `insert into users (telegram_id, username, first_name, last_name)
-     values ($1, $2, $3, $4)
+    `insert into users (telegram_id, username, first_name, last_name, timezone)
+     values ($1, $2, $3, $4, coalesce($5, 'UTC'))
      on conflict (telegram_id) do update set
        username = excluded.username,
        first_name = excluded.first_name,
-       last_name = excluded.last_name
+       last_name = excluded.last_name,
+       timezone = coalesce($5, users.timezone)
      returning *`,
-    [tgUser.id, tgUser.username ?? null, tgUser.first_name ?? null, tgUser.last_name ?? null]
+    [tgUser.id, tgUser.username ?? null, tgUser.first_name ?? null, tgUser.last_name ?? null, timezone]
   );
 
   const user = upsertResult.rows[0];
