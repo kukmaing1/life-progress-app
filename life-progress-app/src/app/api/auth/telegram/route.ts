@@ -39,15 +39,23 @@ export async function POST(req: NextRequest) {
   const { user: tgUser } = validated;
 
   const upsertResult = await pool.query(
-    `insert into users (telegram_id, username, first_name, last_name, timezone)
-     values ($1, $2, $3, $4, coalesce($5, 'UTC'))
+    `insert into users (telegram_id, username, first_name, last_name, timezone, photo_url)
+     values ($1, $2, $3, $4, coalesce($5, 'UTC'), $6)
      on conflict (telegram_id) do update set
        username = excluded.username,
        first_name = excluded.first_name,
        last_name = excluded.last_name,
-       timezone = coalesce($5, users.timezone)
+       timezone = coalesce($5, users.timezone),
+       photo_url = excluded.photo_url
      returning *`,
-    [tgUser.id, tgUser.username ?? null, tgUser.first_name ?? null, tgUser.last_name ?? null, timezone]
+    [
+      tgUser.id,
+      tgUser.username ?? null,
+      tgUser.first_name ?? null,
+      tgUser.last_name ?? null,
+      timezone,
+      tgUser.photo_url ?? null,
+    ]
   );
 
   const user = upsertResult.rows[0];
