@@ -23,14 +23,20 @@ export function TaskActionSheet({
   const [time, setTime] = useState(task?.scheduled_time ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!task) return null;
 
   async function run(action: () => Promise<void>) {
     setBusy(true);
+    setError(null);
     try {
       await action();
       onClose();
+    } catch (err) {
+      // Same reasoning as AddTaskSheet: fail loudly instead of leaving the
+      // sheet sitting there with no feedback and no way to tell what happened.
+      setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
     } finally {
       setBusy(false);
     }
@@ -48,6 +54,10 @@ export function TaskActionSheet({
             <X size={20} />
           </button>
         </div>
+
+        {error && (
+          <p className="mb-3 rounded-xl bg-red-500/10 px-4 py-2.5 text-sm text-red-300">{error}</p>
+        )}
 
         <input
           value={title}
@@ -72,25 +82,4 @@ export function TaskActionSheet({
         <button
           disabled={busy}
           onClick={() => run(() => onPostpone(task.id))}
-          className="mb-2 w-full rounded-pill border border-white/10 py-3 text-center text-cream/80 disabled:opacity-40"
-        >
-          Postpone to tomorrow
-        </button>
-
-        {confirmDelete ? (
-          <button
-            disabled={busy}
-            onClick={() => run(() => onDelete(task.id))}
-            className="w-full rounded-pill bg-red-500/20 py-3 text-center text-red-300 disabled:opacity-40"
-          >
-            Confirm delete
-          </button>
-        ) : (
-          <button onClick={() => setConfirmDelete(true)} className="w-full rounded-pill py-3 text-center text-red-400/80">
-            Delete task
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
+          className="mb-2 w-full rounded-pill border border-white/10 py-3
