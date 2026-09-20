@@ -64,12 +64,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Older Telegram clients may not support these calls — safe to ignore.
     }
 
+    // Best-effort device timezone (e.g. "Europe/Kyiv") so the server isn't stuck
+    // defaulting new users to UTC — see lib/date.ts, "today" must follow the
+    // user's real timezone, not the server's. If detection throws for any
+    // reason, we just omit it and the server keeps whatever it already has.
+    let timezone: string | undefined;
+    try {
+      timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {
+      timezone = undefined;
+    }
+
     try {
       const res = await fetch("/api/auth/telegram", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ initData: tg.initData }),
+        body: JSON.stringify({ initData: tg.initData, timezone }),
       });
       if (!res.ok) throw new Error("auth_failed");
       const data = await res.json();
