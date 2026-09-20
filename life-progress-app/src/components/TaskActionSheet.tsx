@@ -82,4 +82,25 @@ export function TaskActionSheet({
         <button
           disabled={busy}
           onClick={() => run(() => onPostpone(task.id))}
-          className="mb-2 w-full rounded-pill border border-white/10 py-3
+          className="mb-2 w-full rounded-pill border border-white/10 py-3 text-center text-cream/80 disabled:opacity-40"
+        >
+          Postpone to tomorrow
+        </button>
+
+        {confirmDelete ? (
+          <button
+            disabled={busy}
+            onClick={() => run(() => onDelete(task.id))}
+            className="w-full rounded-pill bg-red-500/20 py-3 text-center text-red-300 disabled:opacity-40"
+          >
+            Confirm delete
+          </button>
+        ) : (
+          <button onClick={() => setConfirmDelete(true)} className="w-full rounded-pill py-3 text-center text-red-400/80">
+            Delete task
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
