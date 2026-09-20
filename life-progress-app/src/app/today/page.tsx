@@ -18,6 +18,7 @@ export default function TodayPage() {
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [toastError, setToastError] = useState<string | null>(null);
 
   const loadTasks = useCallback(async () => {
     setLoadingTasks(true);
@@ -35,6 +36,12 @@ export default function TodayPage() {
 
   const { completed: completedCount, planned: plannedCount } = computeProgress(tasks);
 
+  // Split into the three sections the person asked for: a fixed time (e.g.
+  // "12:00") vs. flexible/anytime during the day vs. already done.
+  const scheduledTasks = tasks.filter((t) => t.status === "active" && t.scheduled_time !== null);
+  const anytimeTasks = tasks.filter((t) => t.status === "active" && t.scheduled_time === null);
+  const completedTasks = tasks.filter((t) => t.status === "completed");
+
   async function handleCreate(title: string, time: string | null) {
     await apiFetch("/api/tasks", { method: "POST", body: JSON.stringify({ title, time }) });
     await loadTasks();
@@ -44,6 +51,12 @@ export default function TodayPage() {
     setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: "completed" } : t)));
     try {
       await apiFetch(`/api/tasks/${task.id}/complete`, { method: "POST" });
+    } catch (err) {
+      // The optimistic update above gets corrected back to "active" by the
+      // loadTasks() refetch in `finally` below — this just tells the person
+      // why it reverted instead of leaving them wondering.
+      setToastError(err instanceof Error ? err.message : "Couldn't complete the task. Try again.");
+      setTimeout(() => setToastError(null), 4000);
     } finally {
       loadTasks();
     }
@@ -87,15 +100,53 @@ export default function TodayPage() {
           <ProgressBar completed={completedCount} planned={plannedCount} />
         </div>
 
-        <div className="mt-8 divide-y divide-white/5">
+        {toastError && (
+          <p className="mt-4 rounded-xl bg-red-500/10 px-4 py-2.5 text-sm text-red-300">{toastError}</p>
+        )}
+
+        <div className="mt-8">
           {loadingTasks ? (
             <p className="py-8 text-center text-cream/30">Loading tasks...</p>
           ) : tasks.length === 0 ? (
             <p className="py-8 text-center text-cream/30">Nothing yet — add your first task.</p>
           ) : (
-            tasks.map((task) => (
-              <TaskRow key={task.id} task={task} onToggleComplete={handleToggleComplete} onOpenActions={setActiveTask} />
-            ))
+            // `tasks` is already sorted by the server (see lib/sortTasks): scheduled
+            // tasks chronologically, then anytime tasks, then completed ones. We
+            // just split that same order into labeled groups rather than re-sorting.
+            <>
+              {scheduledTasks.length > 0 && (
+                <div className="mb-6">
+                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">Scheduled</p>
+                  <div className="divide-y divide-white/5">
+                    {scheduledTasks.map((task) => (
+                      <TaskRow key={task.id} task={task} onToggleComplete={handleToggleComplete} onOpenActions={setActiveTask} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {anytimeTasks.length > 0 && (
+                <div className="mb-6">
+                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">Anytime</p>
+                  <div className="divide-y divide-white/5">
+                    {anytimeTasks.map((task) => (
+                      <TaskRow key={task.id} task={task} onToggleComplete={handleToggleComplete} onOpenActions={setActiveTask} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {completedTasks.length > 0 && (
+                <div>
+                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">Completed</p>
+                  <div className="divide-y divide-white/5">
+                    {completedTasks.map((task) => (
+                      <TaskRow key={task.id} task={task} onToggleComplete={handleToggleComplete} onOpenActions={setActiveTask} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
