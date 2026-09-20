@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { BottomNav } from "@/components/BottomNav";
+import { ProfileHeader } from "@/components/ProfileHeader";
 import { apiFetch } from "@/lib/apiClient";
 
 const APP_VERSION = "1.0.0";
@@ -49,9 +50,11 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 px-6 pt-10 pb-10">
-        <h1 className="font-serif text-3xl text-cream">Settings</h1>
+        <ProfileHeader user={user} />
 
-        <div className="mt-8 space-y-6">
+        <h1 className="font-serif text-2xl text-cream">Settings</h1>
+
+        <div className="mt-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-cream">Notifications</p>
