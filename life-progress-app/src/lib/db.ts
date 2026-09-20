@@ -24,11 +24,18 @@ if (process.env.NODE_ENV !== "production") {
   global.__lifeProgressPool = pool;
 }
 
-// Cast date/time columns to plain strings so the API returns "YYYY-MM-DD" / "HH:MM"
-// instead of node-postgres's parsed Date objects (which JSON-serialize as full timestamps).
+// Cast every date/time column to plain text so the API (and anything that touches
+// these rows server-side, like lib/sortTasks) always sees the strings the `Task`
+// type promises — never node-postgres's auto-parsed `Date` objects. Missing this
+// for created_at/updated_at/completed_at previously crashed sortTasks with
+// "e.created_at.localeCompare is not a function" as soon as a comparison actually
+// ran (i.e. from the 2nd task of the day onward) — a JS Date has no localeCompare.
 export const TASK_COLUMNS = `
   id, user_id, title,
   scheduled_date::text as scheduled_date,
   scheduled_time::text as scheduled_time,
-  status, completed_at, created_at, updated_at
+  status,
+  to_char(completed_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as completed_at,
+  to_char(created_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as created_at,
+  to_char(updated_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as updated_at
 `;
