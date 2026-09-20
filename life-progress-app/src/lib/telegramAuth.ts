@@ -5,6 +5,10 @@ export interface TelegramUser {
   first_name: string;
   last_name?: string;
   username?: string;
+  // Present for essentially all Mini Apps since Bot API 8.0 (Nov 2024) — but still
+  // optional: absent if the user has no public profile photo or hides it via privacy
+  // settings, so callers must handle the missing case (initials avatar), never assume it.
+  photo_url?: string;
 }
 
 export interface ValidatedInitData {
