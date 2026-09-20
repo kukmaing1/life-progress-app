@@ -5,13 +5,13 @@ import { usePathname } from "next/navigation";
 import { CheckSquare, Mountain, TrendingUp, Settings } from "lucide-react";
 import { useState } from "react";
 
-// Only Today and Settings are real in V1 (spec section 14) — Goals and
-// Progress are shown as disabled placeholders for the future nav, never
-// as fake screens.
+// Today, Progress and Settings are real (Progress shipped in the roadmap's
+// Phase 1 — free calendar/history view). Goals is still a disabled
+// placeholder until Phase 2 (spec section 14) — never a fake screen.
 const items = [
   { href: "/today", label: "Today", icon: CheckSquare, enabled: true },
   { href: "#", label: "Goals", icon: Mountain, enabled: false },
-  { href: "#", label: "Progress", icon: TrendingUp, enabled: false },
+  { href: "/progress", label: "Progress", icon: TrendingUp, enabled: true },
   { href: "/settings", label: "Settings", icon: Settings, enabled: true },
 ] as const;
 
