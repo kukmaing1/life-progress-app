@@ -30,3 +30,8 @@ export interface DailyProgress {
   completed: number;
   planned: number;
 }
+
+export interface MonthProgress {
+  month: string; // YYYY-MM
+  days: DailyProgress[]; // only days with at least one task
+}
