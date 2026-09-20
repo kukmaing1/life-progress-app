@@ -40,6 +40,11 @@ export function isValidDateString(value: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value).getTime());
 }
 
+/** Basic YYYY-MM validation (calendar month view — see /api/progress/month). */
+export function isValidMonthString(value: string): boolean {
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+}
+
 /** Basic HH:MM validation (24h). */
 export function isValidTimeString(value: string): boolean {
   return /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
