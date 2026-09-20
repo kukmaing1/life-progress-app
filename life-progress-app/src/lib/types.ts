@@ -6,6 +6,7 @@ export interface User {
   last_name: string | null;
   timezone: string;
   notifications_enabled: boolean;
+  photo_url: string | null;
   created_at: string;
   updated_at: string;
 }
