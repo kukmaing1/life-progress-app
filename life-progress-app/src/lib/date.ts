@@ -46,6 +46,23 @@ export function isValidMonthString(value: string): boolean {
 }
 
 /**
+ * "Thursday, September 24" — the long date label shared by Today (today's
+ * date) and Progress (the selected day). UTC-parsed on purpose, same
+ * reasoning as the calendar grid helpers below: the input is always a plain
+ * "YYYY-MM-DD" string that's already been resolved against the right
+ * timezone upstream, so formatting it must not re-apply the browser's own.
+ */
+export function formatDateLong(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+/**
  * Calendar grid helpers for the Progress month view. All UTC-based on
  * purpose — these only ever operate on a "YYYY-MM" string, never a Date
  * from the browser, so there's no local-timezone rollover risk (the exact
