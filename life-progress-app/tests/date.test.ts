@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   addDaysToDateString,
+  addMonths,
+  daysInMonth,
+  firstWeekdayOfMonth,
+  formatDateLong,
   getDateInTimezone,
   isValidDateString,
+  isValidMonthString,
   isValidTimeString,
   isValidTimezone,
 } from "@/lib/date";
@@ -46,5 +51,41 @@ describe("validators", () => {
   it("validates IANA timezone names", () => {
     expect(isValidTimezone("Europe/Kyiv")).toBe(true);
     expect(isValidTimezone("Not/ARealZone")).toBe(false);
+  });
+
+  it("validates YYYY-MM month strings", () => {
+    expect(isValidMonthString("2026-09")).toBe(true);
+    expect(isValidMonthString("2026-13")).toBe(false);
+    expect(isValidMonthString("2026-9")).toBe(false);
+    expect(isValidMonthString("2026-09-19")).toBe(false);
+  });
+});
+
+describe("formatDateLong", () => {
+  it("formats a plain date string as a long UTC-anchored label", () => {
+    // Sep 24, 2026 is a Thursday.
+    expect(formatDateLong("2026-09-24")).toBe("Thursday, September 24");
+    expect(formatDateLong("2026-01-01")).toBe("Thursday, January 1");
+  });
+});
+
+describe("calendar grid helpers", () => {
+  it("counts days in a month, leap years included", () => {
+    expect(daysInMonth("2026-09")).toBe(30);
+    expect(daysInMonth("2026-02")).toBe(28);
+    expect(daysInMonth("2024-02")).toBe(29); // leap year
+  });
+
+  it("finds the Monday-first weekday of the 1st", () => {
+    // Sep 1, 2026 is a Tuesday -> index 1 (Mon=0).
+    expect(firstWeekdayOfMonth("2026-09")).toBe(1);
+    // Nov 1, 2026 is a Sunday -> index 6.
+    expect(firstWeekdayOfMonth("2026-11")).toBe(6);
+  });
+
+  it("shifts months across year boundaries", () => {
+    expect(addMonths("2026-09", 1)).toBe("2026-10");
+    expect(addMonths("2026-12", 1)).toBe("2027-01");
+    expect(addMonths("2026-01", -1)).toBe("2025-12");
   });
 });
