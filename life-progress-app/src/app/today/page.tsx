@@ -9,6 +9,7 @@ import { TaskRow } from "@/components/TaskRow";
 import { AddTaskSheet } from "@/components/AddTaskSheet";
 import { TaskActionSheet } from "@/components/TaskActionSheet";
 import { apiFetch } from "@/lib/apiClient";
+import { formatDateLong, getDateInTimezone } from "@/lib/date";
 import { computeProgress } from "@/lib/progress";
 import type { Task } from "@/lib/types";
 
@@ -93,7 +94,8 @@ export default function TodayPage() {
     <div className="flex flex-1 flex-col">
       <div className="flex-1 overflow-y-auto px-6 pt-10 pb-28">
         <h1 className="font-serif text-3xl text-cream">Today</h1>
-        <p className="mt-2 text-sm text-cream/50">
+        <p className="mt-1 text-sm text-cream/40">{formatDateLong(getDateInTimezone(user.timezone))}</p>
+        <p className="mt-3 text-sm text-cream/50">
           {completedCount} / {plannedCount} completed
         </p>
         <div className="mt-3">
