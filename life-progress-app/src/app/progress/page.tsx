@@ -5,7 +5,7 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { BottomNav } from "@/components/BottomNav";
 import { apiFetch } from "@/lib/apiClient";
-import { addMonths, daysInMonth, firstWeekdayOfMonth, getDateInTimezone } from "@/lib/date";
+import { addMonths, daysInMonth, firstWeekdayOfMonth, formatDateLong, getDateInTimezone } from "@/lib/date";
 import type { MonthProgress, Task } from "@/lib/types";
 
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -18,16 +18,6 @@ function monthLabel(month: string): string {
   return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
-function formatSelectedDate(date: string): string {
-  const [y, m, d] = date.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
     timeZone: "UTC",
   });
 }
@@ -152,7 +142,7 @@ export default function ProgressPage() {
         </div>
 
         <div className="mt-8 border-t border-white/5 pt-6">
-          <p className="mb-2 text-sm text-cream/50">{selectedDate ? formatSelectedDate(selectedDate) : ""}</p>
+          <p className="mb-2 text-sm text-cream/50">{selectedDate ? formatDateLong(selectedDate) : ""}</p>
 
           {dayLoading ? (
             <p className="py-6 text-center text-cream/30">Loading...</p>
