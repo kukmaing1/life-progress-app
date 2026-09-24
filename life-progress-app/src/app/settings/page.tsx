@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { BottomNav } from "@/components/BottomNav";
-import { ProfileHeader } from "@/components/ProfileHeader";
 import { apiFetch } from "@/lib/apiClient";
 
 const APP_VERSION = "1.0.0";
@@ -50,11 +51,18 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 px-6 pt-10 pb-10">
-        <ProfileHeader user={user} />
+        <div className="flex items-center gap-3">
+          <Link
+            href="/profile"
+            className="flex h-8 w-8 items-center justify-center text-cream/50 active:text-cream"
+            aria-label="Back to profile"
+          >
+            <ChevronLeft size={22} />
+          </Link>
+          <h1 className="font-serif text-2xl text-cream">Settings</h1>
+        </div>
 
-        <h1 className="font-serif text-2xl text-cream">Settings</h1>
-
-        <div className="mt-6 space-y-6">
+        <div className="mt-8 space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-cream">Notifications</p>
