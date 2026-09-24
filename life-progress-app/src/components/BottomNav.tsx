@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CheckSquare, Mountain, TrendingUp, Settings } from "lucide-react";
+import { CheckSquare, Mountain, TrendingUp, User } from "lucide-react";
 import { useState } from "react";
 
-// Today, Progress and Settings are real (Progress shipped in the roadmap's
-// Phase 1 — free calendar/history view). Goals is still a disabled
-// placeholder until Phase 2 (spec section 14) — never a fake screen.
+// Today, Progress and Profile are real (Progress shipped in the roadmap's
+// Phase 1 — free calendar/history view; Profile is the identity/stats hub,
+// with technical Settings one tap away from there rather than in the nav).
+// Goals is still a disabled placeholder until Phase 2 (spec section 14) —
+// never a fake screen.
 const items = [
   { href: "/today", label: "Today", icon: CheckSquare, enabled: true },
   { href: "#", label: "Goals", icon: Mountain, enabled: false },
   { href: "/progress", label: "Progress", icon: TrendingUp, enabled: true },
-  { href: "/settings", label: "Settings", icon: Settings, enabled: true },
+  { href: "/profile", label: "Profile", icon: User, enabled: true },
 ] as const;
 
 export function BottomNav() {
