@@ -20,9 +20,14 @@ export async function GET() {
 
   const today = getDateInTimezone(user.timezone);
 
+  // generate_series($2::date - interval '6 days', ...) yields `timestamp` rows
+  // (subtracting an interval from a date promotes it), so gs.date is a
+  // timestamp — casting straight to ::text produced "2026-09-19 00:00:00"
+  // and broke the client's "YYYY-MM-DD" parsing (showed as "Invalid Date").
+  // The extra ::date strips the time part back off before the text cast.
   const { rows } = await pool.query<{ date: string; completed: number; planned: number }>(
     `select
-       gs.date::text as date,
+       gs.date::date::text as date,
        coalesce(count(t.id) filter (where t.status = 'completed'), 0)::int as completed,
        coalesce(count(t.id), 0)::int as planned
      from generate_series($2::date - interval '6 days', $2::date, interval '1 day') as gs(date)
