@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Flame, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, Flame, CheckCircle2 } from "lucide-react";
 import { apiFetch } from "@/lib/apiClient";
-import type { User } from "@/lib/types";
+import { formatWeekdayShort, getDateInTimezone } from "@/lib/date";
+import { dayDotVariant } from "@/lib/progress";
+import { ProgressDot } from "@/components/ProgressDot";
+import type { DailyProgress, User, WeekProgress } from "@/lib/types";
 
 interface ProfileStats {
   streak: number;
@@ -20,14 +24,15 @@ function initials(user: User): string {
  * The Profile page's hero block (roadmap Phase 1; originally an inline
  * strip at the top of the old combined Settings page, now the whole point
  * of its own Profile page): a bigger centered avatar + name + stat cards,
- * so it reads as "who you are and how you're doing" rather than a row of
- * technical controls. Avatar is the Telegram photo when available, initials
- * otherwise — most users won't have one loaded on first use, so this must
- * never look broken.
+ * plus a "this week" strip so the page doesn't dead-end in empty space
+ * below the stats — it links through to the full Progress history. Avatar
+ * is the Telegram photo when available, initials otherwise — most users
+ * won't have one loaded on first use, so this must never look broken.
  */
 export function ProfileHeader({ user }: { user: User }) {
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [imgFailed, setImgFailed] = useState(false);
+  const [week, setWeek] = useState<DailyProgress[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,7 +48,22 @@ export function ProfileHeader({ user }: { user: User }) {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    apiFetch<WeekProgress>("/api/progress/week")
+      .then((data) => {
+        if (!cancelled) setWeek(data.days);
+      })
+      .catch(() => {
+        // Decorative — a failed fetch just leaves the strip blank, no error banner.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const showPhoto = Boolean(user.photo_url) && !imgFailed;
+  const today = getDateInTimezone(user.timezone);
 
   return (
     <div className="flex flex-col items-center pb-8 pt-4 text-center">
@@ -82,6 +102,30 @@ export function ProfileHeader({ user }: { user: User }) {
           <p className="mt-1 text-xs uppercase tracking-[0.1em] text-cream/40">Completed</p>
         </div>
       </div>
+
+      <Link
+        href="/progress"
+        className="mt-3 block w-full rounded-card border border-white/5 bg-white/[0.03] px-4 py-4 text-left active:bg-white/[0.06]"
+      >
+        <div className="flex items-center justify-between text-cream/50">
+          <span className="text-xs font-medium uppercase tracking-[0.1em]">This week</span>
+          <ChevronRight size={16} />
+        </div>
+        <div className="mt-3 flex items-center justify-between">
+          {(week ?? Array.from({ length: 7 }, () => null)).map((day, i) => (
+            <div key={day?.date ?? i} className="flex flex-col items-center gap-1.5">
+              <span
+                className={`text-[10px] uppercase tracking-wide ${
+                  day && day.date === today ? "text-gold" : "text-cream/30"
+                }`}
+              >
+                {day ? formatWeekdayShort(day.date) : ""}
+              </span>
+              <ProgressDot variant={dayDotVariant(day ?? undefined)} size="h-2 w-2" />
+            </div>
+          ))}
+        </div>
+      </Link>
     </div>
   );
 }
