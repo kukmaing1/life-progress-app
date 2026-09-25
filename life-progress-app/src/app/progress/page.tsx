@@ -1,11 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { BottomNav } from "@/components/BottomNav";
+import { ProgressDot } from "@/components/ProgressDot";
 import { apiFetch } from "@/lib/apiClient";
 import { addMonths, daysInMonth, firstWeekdayOfMonth, formatDateLong, getDateInTimezone } from "@/lib/date";
+import { dayDotVariant } from "@/lib/progress";
 import type { MonthProgress, Task } from "@/lib/types";
 
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -115,17 +117,6 @@ export default function ProgressPage() {
             const dayNum = Number(date.slice(-2));
             const isSelected = date === selectedDate;
 
-            let dot: ReactNode = <span className="block h-1.5 w-1.5" />;
-            if (day && day.planned > 0) {
-              if (day.completed === day.planned) {
-                dot = <span className="block h-1.5 w-1.5 rounded-full bg-gold shadow-glow" />;
-              } else if (day.completed > 0) {
-                dot = <span className="block h-1.5 w-1.5 rounded-full bg-gold/40" />;
-              } else {
-                dot = <span className="block h-1.5 w-1.5 rounded-full border border-cream/30" />;
-              }
-            }
-
             return (
               <button
                 key={date}
@@ -135,7 +126,7 @@ export default function ProgressPage() {
                 }`}
               >
                 <span className="text-sm text-cream/80">{dayNum}</span>
-                {dot}
+                <ProgressDot variant={dayDotVariant(day)} />
               </button>
             );
           })}
