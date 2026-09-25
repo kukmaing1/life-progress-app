@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { getDateInTimezone } from "@/lib/date";
+import { secureCompare } from "@/lib/secureCompare";
 
 // This route touches the database on every call and must never be
 // statically prerendered/cached at build time (it doesn't use cookies(),
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret) {
     const provided = req.headers.get("authorization")?.replace("Bearer ", "");
-    if (provided !== cronSecret) {
+    if (!provided || !secureCompare(provided, cronSecret)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
