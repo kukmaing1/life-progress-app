@@ -5,6 +5,7 @@ import {
   daysInMonth,
   firstWeekdayOfMonth,
   formatDateLong,
+  formatWeekdayShort,
   getDateInTimezone,
   isValidDateString,
   isValidMonthString,
@@ -66,6 +67,13 @@ describe("formatDateLong", () => {
     // Sep 24, 2026 is a Thursday.
     expect(formatDateLong("2026-09-24")).toBe("Thursday, September 24");
     expect(formatDateLong("2026-01-01")).toBe("Thursday, January 1");
+  });
+});
+
+describe("formatWeekdayShort", () => {
+  it("formats a plain date string as a short UTC-anchored weekday", () => {
+    expect(formatWeekdayShort("2026-09-24")).toBe("Thu");
+    expect(formatWeekdayShort("2026-09-19")).toBe("Sat");
   });
 });
 
