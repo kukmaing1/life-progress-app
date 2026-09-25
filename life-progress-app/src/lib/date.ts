@@ -62,6 +62,15 @@ export function formatDateLong(date: string): string {
   });
 }
 
+/** "Mon", "Tue", ... — short weekday label for a "YYYY-MM-DD" string, UTC-parsed for the same reason as formatDateLong above. */
+export function formatWeekdayShort(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
+    weekday: "short",
+    timeZone: "UTC",
+  });
+}
+
 /**
  * Calendar grid helpers for the Progress month view. All UTC-based on
  * purpose — these only ever operate on a "YYYY-MM" string, never a Date
