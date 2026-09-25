@@ -19,15 +19,22 @@ function getSecret(): string {
 export function createSessionToken(userId: string): string {
   return jwt.sign({ userId } satisfies SessionPayload, getSecret(), {
     expiresIn: SESSION_TTL_SECONDS,
+    algorithm: "HS256",
   });
 }
 
-/** Reads and verifies the session cookie on the current request. Returns null if absent/invalid. */
+/**
+ * Reads and verifies the session cookie on the current request. Returns
+ * null if absent/invalid. `algorithms: ["HS256"]` pins the algorithm
+ * explicitly rather than trusting whatever the token claims — jsonwebtoken
+ * already defaults to this, so it changes nothing for tokens issued above,
+ * it just stops verify() from ever honoring a different algorithm.
+ */
 export function getSessionUserId(): string | null {
   const token = cookies().get(COOKIE_NAME)?.value;
   if (!token) return null;
   try {
-    const payload = jwt.verify(token, getSecret()) as SessionPayload;
+    const payload = jwt.verify(token, getSecret(), { algorithms: ["HS256"] }) as SessionPayload;
     return payload.userId;
   } catch {
     return null;
