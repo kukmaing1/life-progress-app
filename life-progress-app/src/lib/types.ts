@@ -35,3 +35,7 @@ export interface MonthProgress {
   month: string; // YYYY-MM
   days: DailyProgress[]; // only days with at least one task
 }
+
+export interface WeekProgress {
+  days: DailyProgress[]; // exactly 7 entries, oldest to newest, today inclusive
+}
