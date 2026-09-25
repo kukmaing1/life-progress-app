@@ -1,46 +1,48 @@
+// Total length of the path below (sum of every H/V segment) — used so the
+// traveling highlight's dash pattern (dash + gap) tiles the route exactly
+// once, and so animating stroke-dashoffset by exactly this amount loops
+// seamlessly with no visible jump when it restarts.
 const STAIR_PATH = "M10 140 H70 V110 H130 V90 H190 V60 H250 V30 H310";
+const STAIR_PATH_LENGTH = 410;
 
-// Same color for every dot (per feedback — no more mixed gold/cream), and a
-// slower pace: this is a calm, ambient illustration on the splash/onboarding
-// screen, not a loading spinner, so it doesn't need to be fast or even
-// finish a full lap before the screen moves on.
-const DOT_COLOR = "#f0d5a8";
-const LAP_DURATION = "5s";
-const DOT_STAGGER = 0.9; // seconds between each dot starting its climb
-
+/**
+ * The onboarding/splash staircase. Dots stay put at fixed positions and
+ * just breathe gently — the actual motion is a soft highlight that travels
+ * along the route itself, giving the illustration life without anything
+ * moving around.
+ *
+ * Plain CSS @keyframes rather than SMIL (<animate>/<animateMotion>): an
+ * earlier version used animateMotion to move the dots themselves, and in
+ * practice it rendered a stray dot in the SVG's default (0,0) corner during
+ * each dot's staggered start delay — CSS animations don't have that
+ * before-it-starts state, so this is the more reliable approach across
+ * Telegram's various in-app browser engines.
+ */
 export function StepsIllustration() {
   return (
     <svg viewBox="0 0 320 160" className="w-full max-w-xs" fill="none" aria-hidden="true">
-      <path d={STAIR_PATH} stroke="url(#stepGradient)" strokeWidth="2" strokeLinecap="round">
-        {/* The staircase itself gets the barest breathing pulse — a wink of
-            life behind the climbing dots, not a competing animation. */}
-        <animate attributeName="opacity" values="0.75;1;0.75" dur="4s" repeatCount="indefinite" />
-      </path>
+      <style>{`
+        @keyframes lp-stair-line-glow { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
+        @keyframes lp-stair-dot-pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+        @keyframes lp-stair-flow { to { stroke-dashoffset: -${STAIR_PATH_LENGTH}; } }
+        .lp-stair-path { animation: lp-stair-line-glow 4s ease-in-out infinite; }
+        .lp-stair-dot { animation: lp-stair-dot-pulse 2.6s ease-in-out infinite; }
+        .lp-stair-flow {
+          stroke-dasharray: 60 ${STAIR_PATH_LENGTH - 60};
+          animation: lp-stair-flow 3.4s linear infinite;
+        }
+      `}</style>
 
-      {/* Ambient glow at the top of the stairs — the destination the dots climb toward. */}
+      <path d={STAIR_PATH} className="lp-stair-path" stroke="url(#stepGradient)" strokeWidth="2" strokeLinecap="round" />
+
+      {/* The traveling highlight — a short bright segment sliding along the
+          same route, bottom to top, on top of the base line. */}
+      <path d={STAIR_PATH} className="lp-stair-flow" stroke="#f6efe3" strokeWidth="2" strokeLinecap="round" opacity="0.85" />
+
+      <circle cx="70" cy="110" r="5" fill="#e8b86d" opacity="0.85" className="lp-stair-dot" />
+      <circle cx="190" cy="60" r="5" fill="#e8b86d" opacity="0.85" className="lp-stair-dot" />
       <circle cx="310" cy="30" r="18" fill="#e8b86d" opacity="0.2" />
-
-      {/*
-        Three dots climbing the staircase one after another — same color,
-        staggered start times so they read as a short train following the
-        same path rather than three unrelated loops.
-      */}
-      {[0, 1, 2].map((i) => {
-        const begin = `${i * DOT_STAGGER}s`;
-        return (
-          <circle key={i} r="5" fill={DOT_COLOR}>
-            <animateMotion dur={LAP_DURATION} begin={begin} repeatCount="indefinite" path={STAIR_PATH} />
-            <animate
-              attributeName="opacity"
-              values="0;1;1;0"
-              keyTimes="0;0.06;0.9;1"
-              dur={LAP_DURATION}
-              begin={begin}
-              repeatCount="indefinite"
-            />
-          </circle>
-        );
-      })}
+      <circle cx="310" cy="30" r="6" fill="#f0d5a8" className="lp-stair-dot" />
 
       <defs>
         <linearGradient id="stepGradient" x1="0" y1="160" x2="320" y2="0">
