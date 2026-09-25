@@ -7,37 +7,39 @@ const STAIR_PATH_LENGTH = 410;
 
 /**
  * The onboarding/splash staircase. Dots stay put at fixed positions and
- * just breathe gently — the actual motion is a soft highlight that travels
- * along the route itself, giving the illustration life without anything
- * moving around.
- *
- * Plain CSS @keyframes rather than SMIL (<animate>/<animateMotion>): an
- * earlier version used animateMotion to move the dots themselves, and in
- * practice it rendered a stray dot in the SVG's default (0,0) corner during
- * each dot's staggered start delay — CSS animations don't have that
- * before-it-starts state, so this is the more reliable approach across
- * Telegram's various in-app browser engines.
+ * pulse gently in place; the route itself comes alive via a soft highlight
+ * traveling along it, slowly, in the same gold family as the line rather
+ * than a contrasting color.
  */
 export function StepsIllustration() {
   return (
     <svg viewBox="0 0 320 160" className="w-full max-w-xs" fill="none" aria-hidden="true">
       <style>{`
         @keyframes lp-stair-line-glow { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
-        @keyframes lp-stair-dot-pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+        @keyframes lp-stair-dot-pulse {
+          0%, 100% { opacity: 0.55; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
         @keyframes lp-stair-flow { to { stroke-dashoffset: -${STAIR_PATH_LENGTH}; } }
         .lp-stair-path { animation: lp-stair-line-glow 4s ease-in-out infinite; }
-        .lp-stair-dot { animation: lp-stair-dot-pulse 2.6s ease-in-out infinite; }
+        .lp-stair-dot {
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: lp-stair-dot-pulse 2.6s ease-in-out infinite;
+        }
         .lp-stair-flow {
           stroke-dasharray: 60 ${STAIR_PATH_LENGTH - 60};
-          animation: lp-stair-flow 3.4s linear infinite;
+          animation: lp-stair-flow 7s linear infinite;
         }
       `}</style>
 
       <path d={STAIR_PATH} className="lp-stair-path" stroke="url(#stepGradient)" strokeWidth="2" strokeLinecap="round" />
 
-      {/* The traveling highlight — a short bright segment sliding along the
-          same route, bottom to top, on top of the base line. */}
-      <path d={STAIR_PATH} className="lp-stair-flow" stroke="#f6efe3" strokeWidth="2" strokeLinecap="round" opacity="0.85" />
+      {/* Traveling highlight — same gold family as the line (just a shade
+          lighter), so it reads as the line glowing rather than a
+          different-colored object sliding over it. Slow: a calm current,
+          not a race. */}
+      <path d={STAIR_PATH} className="lp-stair-flow" stroke="#f0d5a8" strokeWidth="2" strokeLinecap="round" opacity="0.9" />
 
       <circle cx="70" cy="110" r="5" fill="#e8b86d" opacity="0.85" className="lp-stair-dot" />
       <circle cx="190" cy="60" r="5" fill="#e8b86d" opacity="0.85" className="lp-stair-dot" />
