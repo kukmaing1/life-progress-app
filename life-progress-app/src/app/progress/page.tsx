@@ -6,23 +6,18 @@ import { useAuth } from "@/components/AuthProvider";
 import { BottomNav } from "@/components/BottomNav";
 import { ProgressDot } from "@/components/ProgressDot";
 import { apiFetch } from "@/lib/apiClient";
-import { addMonths, daysInMonth, firstWeekdayOfMonth, formatDateLong, getDateInTimezone } from "@/lib/date";
+import {
+  addMonths,
+  daysInMonth,
+  firstWeekdayOfMonth,
+  formatDateLong,
+  formatMonthYear,
+  getDateInTimezone,
+  getWeekdayLabels,
+} from "@/lib/date";
 import { dayDotVariant } from "@/lib/progress";
+import { useLocale } from "@/components/LocaleProvider";
 import type { MonthProgress, Task } from "@/lib/types";
-
-const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-// All date math here works on the "YYYY-MM(-DD)" strings directly via UTC —
-// never a bare `new Date(dateString)` in the browser's own timezone, which is
-// exactly the class of off-by-one-day bug the timezone fixes elsewhere were about.
-function monthLabel(month: string): string {
-  const [y, m] = month.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 /**
  * The "look back at past days" history view (roadmap Phase 1 — free,
@@ -31,6 +26,7 @@ function monthLabel(month: string): string {
  */
 export default function ProgressPage() {
   const { user, loading: authLoading } = useAuth();
+  const { t, locale } = useLocale();
   const [month, setMonth] = useState<string | null>(null);
   const [monthData, setMonthData] = useState<MonthProgress | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -69,7 +65,7 @@ export default function ProgressPage() {
   }, [selectedDate, loadDay]);
 
   if (authLoading || !user || !month) {
-    return <div className="flex flex-1 items-center justify-center text-cream/40">Loading...</div>;
+    return <div className="flex flex-1 items-center justify-center text-cream/40">{t("common.loading")}</div>;
   }
 
   const byDate = new Map((monthData?.days ?? []).map((d) => [d.date, d]));
@@ -83,29 +79,29 @@ export default function ProgressPage() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 overflow-y-auto px-6 pt-10 pb-28">
-        <h1 className="font-serif text-3xl text-cream">Progress</h1>
+        <h1 className="font-serif text-3xl text-cream">{t("progress.title")}</h1>
 
         <div className="mt-8 flex items-center justify-between">
           <button
             onClick={() => setMonth((m) => (m ? addMonths(m, -1) : m))}
             className="p-2 text-cream/50 active:text-cream"
-            aria-label="Previous month"
+            aria-label={t("progress.prevMonthAria")}
           >
             <ChevronLeft size={20} />
           </button>
-          <p className="text-cream">{monthLabel(month)}</p>
+          <p className="text-cream">{formatMonthYear(month, locale)}</p>
           <button
             onClick={() => setMonth((m) => (m ? addMonths(m, 1) : m))}
             className="p-2 text-cream/50 active:text-cream"
-            aria-label="Next month"
+            aria-label={t("progress.nextMonthAria")}
           >
             <ChevronRight size={20} />
           </button>
         </div>
 
         <div className="mt-4 grid grid-cols-7 text-center text-xs text-cream/30">
-          {WEEKDAY_LABELS.map((d) => (
-            <span key={d}>{d}</span>
+          {getWeekdayLabels(locale).map((d, i) => (
+            <span key={i}>{d}</span>
           ))}
         </div>
 
@@ -133,12 +129,14 @@ export default function ProgressPage() {
         </div>
 
         <div className="mt-8 border-t border-hairline pt-6">
-          <p className="mb-2 text-sm text-cream/50">{selectedDate ? formatDateLong(selectedDate) : ""}</p>
+          <p className="mb-2 text-sm text-cream/50">
+            {selectedDate ? formatDateLong(selectedDate, locale) : ""}
+          </p>
 
           {dayLoading ? (
-            <p className="py-6 text-center text-cream/30">Loading...</p>
+            <p className="py-6 text-center text-cream/30">{t("common.loading")}</p>
           ) : !dayTasks || dayTasks.length === 0 ? (
-            <p className="py-6 text-center text-cream/30">Nothing planned that day.</p>
+            <p className="py-6 text-center text-cream/30">{t("progress.nothingPlanned")}</p>
           ) : (
             <div className="divide-y divide-hairline">
               {dayTasks.map((task) => (
