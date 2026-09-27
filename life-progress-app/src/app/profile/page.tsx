@@ -5,6 +5,7 @@ import { Settings as SettingsIcon } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { BottomNav } from "@/components/BottomNav";
 import { ProfileHeader } from "@/components/ProfileHeader";
+import { useLocale } from "@/components/LocaleProvider";
 
 /**
  * Profile — who you are and how you're doing (roadmap Phase 1, split out
@@ -14,20 +15,21 @@ import { ProfileHeader } from "@/components/ProfileHeader";
  */
 export default function ProfilePage() {
   const { user, loading } = useAuth();
+  const { t } = useLocale();
 
   if (loading || !user) {
-    return <div className="flex flex-1 items-center justify-center text-cream/40">Loading...</div>;
+    return <div className="flex flex-1 items-center justify-center text-cream/40">{t("common.loading")}</div>;
   }
 
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 overflow-y-auto px-6 pt-10 pb-28">
         <div className="flex items-center justify-between">
-          <h1 className="font-serif text-3xl text-cream">Profile</h1>
+          <h1 className="font-serif text-3xl text-cream">{t("profile.title")}</h1>
           <Link
             href="/settings"
             className="flex h-9 w-9 items-center justify-center rounded-full text-cream/50 active:text-cream"
-            aria-label="Settings"
+            aria-label={t("profile.settingsAria")}
           >
             <SettingsIcon size={20} />
           </Link>
