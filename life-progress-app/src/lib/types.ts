@@ -1,3 +1,5 @@
+import type { Locale } from "./locale";
+
 export interface User {
   id: string;
   telegram_id: string;
@@ -7,6 +9,7 @@ export interface User {
   timezone: string;
   notifications_enabled: boolean;
   theme: "dark" | "light";
+  locale: Locale;
   photo_url: string | null;
   created_at: string;
   updated_at: string;
