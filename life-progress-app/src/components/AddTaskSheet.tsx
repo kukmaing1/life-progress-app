@@ -79,11 +79,18 @@ export function AddTaskSheet({
           onKeyDown={(e) => e.key === "Enter" && handleSave()}
         />
 
+        {/* iOS/Android render native time/date inputs with their own internal
+            chrome (font metrics, padding) that doesn't reliably match our
+            custom py-based sizing — on a phone the rows visibly drifted out
+            of alignment with each other even though desktop looked fine.
+            Fixing every row (this input, the chips, the date input below) to
+            the same explicit h-12 with appearance-none + centered text makes
+            the height consistent regardless of platform quirks. */}
         <input
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          className="mb-3 w-full rounded-xl bg-black/20 px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50 [color-scheme:dark]"
+          className="mb-3 h-12 w-full appearance-none rounded-xl bg-black/20 px-4 text-center text-cream focus:outline-none focus:ring-1 focus:ring-gold/50 [color-scheme:dark]"
         />
 
         {/* Planning ahead is a secondary, optional step — most tasks are still
@@ -95,7 +102,7 @@ export function AddTaskSheet({
           <button
             type="button"
             onClick={() => setDate(todayDate)}
-            className={`flex-1 rounded-xl py-2 text-sm transition-colors ${
+            className={`flex h-12 flex-1 items-center justify-center rounded-xl text-sm transition-colors ${
               date === todayDate ? "bg-gold/20 text-gold" : "bg-black/20 text-cream/50"
             }`}
           >
@@ -104,7 +111,7 @@ export function AddTaskSheet({
           <button
             type="button"
             onClick={() => setDate(tomorrow)}
-            className={`flex-1 rounded-xl py-2 text-sm transition-colors ${
+            className={`flex h-12 flex-1 items-center justify-center rounded-xl text-sm transition-colors ${
               date === tomorrow ? "bg-gold/20 text-gold" : "bg-black/20 text-cream/50"
             }`}
           >
@@ -118,7 +125,7 @@ export function AddTaskSheet({
           min={todayDate}
           onChange={(e) => setDate(e.target.value)}
           aria-label="Task date"
-          className="mb-5 w-full rounded-xl bg-black/20 px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50 [color-scheme:dark]"
+          className="mb-5 h-12 w-full appearance-none rounded-xl bg-black/20 px-4 text-center text-cream focus:outline-none focus:ring-1 focus:ring-gold/50 [color-scheme:dark]"
         />
 
         <button
