@@ -2,8 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens as CSS variables — see tailwind.config.ts for how these map
+ * to the Tailwind color classes used throughout the app. Each triplet is
+ * "R G B" (no commas), the format Tailwind's rgb(var(...) / <alpha-value>)
+ * pattern expects, which is what keeps opacity modifiers (text-cream/40,
+ * bg-graphite/95, ...) working correctly in both themes.
+ *
+ * These are the DARK values (the app's original, unchanged look) — the
+ * default and what every user who hasn't picked a theme yet still sees.
+ */
 :root {
   color-scheme: dark;
+
+  --color-graphite-dark: 18 17 20; /* fixed — see tailwind.config.ts */
+  --color-graphite: 28 27 31; /* nav chrome, lifted card surfaces */
+  --color-graphite-light: 42 40 46; /* sheets/modals — most elevated surface */
+  --color-cream: 246 239 227; /* primary text ink */
+
+  --color-gold: 232 184 109;
+  --color-gold-soft: 240 213 168;
+  --color-gold-muted: 185 143 82;
+
+  --color-hairline: 41 39 45; /* subtle 1px dividers/borders */
+  --color-hairline-strong: 58 55 63;
+  --color-field: 21 20 24; /* recessed input/select backgrounds */
+  --color-track: 50 47 53; /* unfilled progress bar / toggle-off / selected-day highlight */
+  --color-pressed: 33 31 36; /* tap/active feedback overlay */
+
+  --page-gradient: radial-gradient(120% 60% at 50% 0%, #2a2730 0%, #16151a 60%, #121114 100%);
+}
+
+/* LIGHT theme — same warm gold/graphite/cream family, inverted. graphite-dark
+ * is deliberately absent here: it never flips (see tailwind.config.ts), so it
+ * keeps inheriting the dark value from :root above in both themes. gold/
+ * gold-soft/gold-muted are deepened, not just reused, because the original
+ * paler tones read fine on a near-black page but fall well below readable
+ * contrast as text on a light one.
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-graphite: 251 248 242;
+  --color-graphite-light: 255 255 255;
+  --color-cream: 43 38 32;
+
+  --color-gold: 184 130 58;
+  --color-gold-soft: 209 166 104;
+  --color-gold-muted: 138 102 51;
+
+  --color-hairline: 232 226 213;
+  --color-hairline-strong: 217 210 192;
+  --color-field: 239 233 220;
+  --color-track: 228 222 208;
+  --color-pressed: 236 229 214;
+
+  --page-gradient: radial-gradient(120% 60% at 50% 0%, #fffdf8 0%, #f8f3e8 60%, #f5efe1 100%);
 }
 
 html,
@@ -12,10 +65,5 @@ body {
 }
 
 body {
-  background: radial-gradient(120% 60% at 50% 0%, #2a2730 0%, #16151a 60%, #121114 100%);
-}
-
-input,
-select {
-  color-scheme: dark;
+  background: var(--page-gradient);
 }
