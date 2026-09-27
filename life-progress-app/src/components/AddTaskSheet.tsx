@@ -2,31 +2,40 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { addDaysToDateString } from "@/lib/date";
 
 export function AddTaskSheet({
   open,
+  todayDate,
   onClose,
   onCreate,
 }: {
   open: boolean;
+  /** "YYYY-MM-DD" for the user's current day (their timezone) — the date
+   * field's default and lower bound, and the "Today" quick-pick target. */
+  todayDate: string;
   onClose: () => void;
-  onCreate: (title: string, time: string | null) => Promise<void>;
+  onCreate: (title: string, time: string | null, date: string) => Promise<void>;
 }) {
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("");
+  const [date, setDate] = useState(todayDate);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!open) return null;
+
+  const tomorrow = addDaysToDateString(todayDate, 1);
 
   async function handleSave() {
     if (!title.trim() || saving) return;
     setSaving(true);
     setError(null);
     try {
-      await onCreate(title.trim(), time || null);
+      await onCreate(title.trim(), time || null, date);
       setTitle("");
       setTime("");
+      setDate(todayDate);
       onClose();
     } catch (err) {
       // Previously this failed silently — the sheet just sat there with no
@@ -74,7 +83,42 @@ export function AddTaskSheet({
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          className="mb-5 w-full rounded-xl bg-black/20 px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
+          className="mb-3 w-full rounded-xl bg-black/20 px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50 [color-scheme:dark]"
+        />
+
+        {/* Planning ahead is a secondary, optional step — most tasks are still
+            for today, so this stays visually quieter than the title/time
+            fields above rather than competing with them. Chips cover the
+            common cases; the date input underneath handles anything further
+            out (a week, a month) without needing its own screen. */}
+        <div className="mb-2 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setDate(todayDate)}
+            className={`flex-1 rounded-xl py-2 text-sm transition-colors ${
+              date === todayDate ? "bg-gold/20 text-gold" : "bg-black/20 text-cream/50"
+            }`}
+          >
+            Today
+          </button>
+          <button
+            type="button"
+            onClick={() => setDate(tomorrow)}
+            className={`flex-1 rounded-xl py-2 text-sm transition-colors ${
+              date === tomorrow ? "bg-gold/20 text-gold" : "bg-black/20 text-cream/50"
+            }`}
+          >
+            Tomorrow
+          </button>
+        </div>
+
+        <input
+          type="date"
+          value={date}
+          min={todayDate}
+          onChange={(e) => setDate(e.target.value)}
+          aria-label="Task date"
+          className="mb-5 w-full rounded-xl bg-black/20 px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50 [color-scheme:dark]"
         />
 
         <button
@@ -82,7 +126,7 @@ export function AddTaskSheet({
           disabled={!title.trim() || saving}
           className="w-full rounded-pill bg-gradient-to-r from-gold-soft to-gold py-3.5 text-center font-medium text-graphite-dark disabled:opacity-40"
         >
-          {saving ? "Saving..." : "Add task"}
+          {saving ? "Saving..." : date === todayDate ? "Add task" : "Plan task"}
         </button>
       </div>
     </div>
