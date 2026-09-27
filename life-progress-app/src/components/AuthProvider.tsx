@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { useLocale } from "@/components/LocaleProvider";
 import type { User } from "@/lib/types";
 
 interface AuthState {
@@ -37,6 +38,7 @@ declare global {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useLocale();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Outside Telegram (e.g. testing the URL directly in a browser) there is
     // no initData to validate, so we stop here rather than pretending to log in.
     if (!tg || !tg.initData) {
-      setError("Open this app from inside Telegram.");
+      setError(t("errors.openInTelegram"));
       setLoading(false);
       return;
     }
@@ -83,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       setUser(data.user);
     } catch {
-      setError("Couldn't sign you in. Close and reopen the app to try again.");
+      setError(t("errors.signInFailed"));
     } finally {
       setLoading(false);
     }
