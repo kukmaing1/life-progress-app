@@ -57,12 +57,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     tg.ready();
     tg.expand();
-    try {
-      tg.setBackgroundColor?.("#1c1b1f");
-      tg.setHeaderColor?.("#1c1b1f");
-    } catch {
-      // Older Telegram clients may not support these calls — safe to ignore.
-    }
+    // Telegram's chrome color (header bar + background) is set by
+    // ThemeProvider instead, since it needs to track the user's theme
+    // preference rather than a single hardcoded value.
 
     // Best-effort device timezone (e.g. "Europe/Kyiv") so the server isn't stuck
     // defaulting new users to UTC — see lib/date.ts, "today" must follow the
