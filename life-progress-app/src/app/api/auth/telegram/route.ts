@@ -4,6 +4,7 @@ import { validateInitData } from "@/lib/telegramAuth";
 import { createSessionToken, sessionCookieOptions } from "@/lib/session";
 import { logEvent } from "@/lib/analytics";
 import { isValidTimezone } from "@/lib/date";
+import { normalizeLocale } from "@/lib/locale";
 
 export async function POST(req: NextRequest) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -38,9 +39,15 @@ export async function POST(req: NextRequest) {
 
   const { user: tgUser } = validated;
 
+  // Only used as the new-user starting language (see the insert below) — like
+  // `theme`, deliberately left out of the `on conflict` SET clause so a
+  // returning user's own choice in Settings is never overwritten by
+  // whatever language their Telegram client happens to be set to.
+  const locale = normalizeLocale(tgUser.language_code);
+
   const upsertResult = await pool.query(
-    `insert into users (telegram_id, username, first_name, last_name, timezone, photo_url)
-     values ($1, $2, $3, $4, coalesce($5, 'UTC'), $6)
+    `insert into users (telegram_id, username, first_name, last_name, timezone, photo_url, locale)
+     values ($1, $2, $3, $4, coalesce($5, 'UTC'), $6, $7)
      on conflict (telegram_id) do update set
        username = excluded.username,
        first_name = excluded.first_name,
@@ -55,6 +62,7 @@ export async function POST(req: NextRequest) {
       tgUser.last_name ?? null,
       timezone,
       tgUser.photo_url ?? null,
+      locale,
     ]
   );
 
