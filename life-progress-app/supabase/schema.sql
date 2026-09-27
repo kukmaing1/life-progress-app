@@ -11,6 +11,8 @@ create table if not exists users (
   last_name text,
   timezone text not null default 'UTC',
   notifications_enabled boolean not null default true,
+  theme text not null default 'dark' check (theme in ('dark', 'light')),
+  photo_url text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
