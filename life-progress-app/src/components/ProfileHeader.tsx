@@ -7,6 +7,7 @@ import { apiFetch } from "@/lib/apiClient";
 import { formatWeekdayShort, getDateInTimezone } from "@/lib/date";
 import { dayDotVariant } from "@/lib/progress";
 import { ProgressDot } from "@/components/ProgressDot";
+import { useLocale } from "@/components/LocaleProvider";
 import type { DailyProgress, User, WeekProgress } from "@/lib/types";
 
 interface ProfileStats {
@@ -30,6 +31,7 @@ function initials(user: User): string {
  * won't have one loaded on first use, so this must never look broken.
  */
 export function ProfileHeader({ user }: { user: User }) {
+  const { t, locale } = useLocale();
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [imgFailed, setImgFailed] = useState(false);
   const [week, setWeek] = useState<DailyProgress[] | null>(null);
@@ -92,14 +94,14 @@ export function ProfileHeader({ user }: { user: User }) {
             <Flame size={18} className={stats && stats.streak > 0 ? "text-gold" : "text-cream/30"} />
             <span className="font-serif text-2xl text-cream">{stats ? stats.streak : "…"}</span>
           </div>
-          <p className="mt-1 text-xs uppercase tracking-[0.1em] text-cream/40">Day streak</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.1em] text-cream/40">{t("profile.dayStreak")}</p>
         </div>
         <div className="rounded-card border border-hairline bg-graphite py-4">
           <div className="flex items-center justify-center gap-1.5">
             <CheckCircle2 size={18} className="text-gold" />
             <span className="font-serif text-2xl text-cream">{stats ? stats.totalCompleted : "…"}</span>
           </div>
-          <p className="mt-1 text-xs uppercase tracking-[0.1em] text-cream/40">Completed</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.1em] text-cream/40">{t("profile.completed")}</p>
         </div>
       </div>
 
@@ -108,7 +110,7 @@ export function ProfileHeader({ user }: { user: User }) {
         className="mt-3 block w-full rounded-card border border-hairline bg-graphite px-4 py-4 text-left active:bg-graphite-light"
       >
         <div className="flex items-center justify-between text-cream/50">
-          <span className="text-xs font-medium uppercase tracking-[0.1em]">This week</span>
+          <span className="text-xs font-medium uppercase tracking-[0.1em]">{t("profile.thisWeek")}</span>
           <ChevronRight size={16} />
         </div>
         <div className="mt-3 flex items-center justify-between">
@@ -119,7 +121,7 @@ export function ProfileHeader({ user }: { user: User }) {
                   day && day.date === today ? "text-gold" : "text-cream/30"
                 }`}
               >
-                {day ? formatWeekdayShort(day.date) : ""}
+                {day ? formatWeekdayShort(day.date, locale) : ""}
               </span>
               <ProgressDot variant={dayDotVariant(day ?? undefined)} size="h-2 w-2" />
             </div>
