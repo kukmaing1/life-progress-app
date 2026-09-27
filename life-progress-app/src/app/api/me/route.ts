@@ -13,7 +13,7 @@ export async function PATCH(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let body: { timezone?: string; notifications_enabled?: boolean };
+  let body: { timezone?: string; notifications_enabled?: boolean; theme?: string };
   try {
     body = await req.json();
   } catch {
@@ -38,6 +38,14 @@ export async function PATCH(req: NextRequest) {
     }
     updates.push(`notifications_enabled = $${idx++}`);
     values.push(body.notifications_enabled);
+  }
+
+  if (body.theme !== undefined) {
+    if (body.theme !== "dark" && body.theme !== "light") {
+      return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
+    }
+    updates.push(`theme = $${idx++}`);
+    values.push(body.theme);
   }
 
   if (updates.length === 0) {
