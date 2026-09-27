@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Clock } from "lucide-react";
+import { useLocale } from "@/components/LocaleProvider";
 import type { Task } from "@/lib/types";
 
 export function TaskRow({
@@ -12,12 +13,13 @@ export function TaskRow({
   onToggleComplete: (task: Task) => void;
   onOpenActions: (task: Task) => void;
 }) {
+  const { t } = useLocale();
   const completed = task.status === "completed";
 
   return (
     <div className="flex items-center gap-3 py-3">
       <button
-        aria-label={completed ? "Completed" : "Mark complete"}
+        aria-label={completed ? t("taskRow.completedAria") : t("taskRow.markCompleteAria")}
         onClick={() => !completed && onToggleComplete(task)}
         disabled={completed}
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors ${
