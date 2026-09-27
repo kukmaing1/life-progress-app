@@ -12,6 +12,7 @@ create table if not exists users (
   timezone text not null default 'UTC',
   notifications_enabled boolean not null default true,
   theme text not null default 'dark' check (theme in ('dark', 'light')),
+  locale text not null default 'en' check (locale in ('en', 'ru', 'uk', 'es')),
   photo_url text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
