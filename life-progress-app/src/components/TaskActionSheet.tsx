@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { useLocale } from "@/components/LocaleProvider";
 import type { Task } from "@/lib/types";
 
 // Parent renders this with `key={task.id}` so switching tasks remounts it
@@ -19,6 +20,7 @@ export function TaskActionSheet({
   onPostpone: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }) {
+  const { t } = useLocale();
   const [title, setTitle] = useState(task?.title ?? "");
   const [time, setTime] = useState(task?.scheduled_time ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -36,7 +38,7 @@ export function TaskActionSheet({
     } catch (err) {
       // Same reasoning as AddTaskSheet: fail loudly instead of leaving the
       // sheet sitting there with no feedback and no way to tell what happened.
-      setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
+      setError(err instanceof Error ? err.message : t("errors.generic"));
     } finally {
       setBusy(false);
     }
@@ -49,8 +51,8 @@ export function TaskActionSheet({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-serif text-lg text-cream">Edit task</h2>
-          <button onClick={onClose} className="text-cream/50" aria-label="Close">
+          <h2 className="font-serif text-lg text-cream">{t("editTask.heading")}</h2>
+          <button onClick={onClose} className="text-cream/50" aria-label={t("editTask.closeAria")}>
             <X size={20} />
           </button>
         </div>
@@ -76,7 +78,7 @@ export function TaskActionSheet({
           onClick={() => run(() => onSave(task.id, title.trim(), time || null))}
           className="mb-2 w-full rounded-pill bg-gradient-to-r from-gold-soft to-gold py-3 text-center font-medium text-graphite-dark disabled:opacity-40"
         >
-          Save changes
+          {t("editTask.saveChanges")}
         </button>
 
         <button
@@ -84,7 +86,7 @@ export function TaskActionSheet({
           onClick={() => run(() => onPostpone(task.id))}
           className="mb-2 w-full rounded-pill border border-hairline-strong py-3 text-center text-cream/80 disabled:opacity-40"
         >
-          Postpone to tomorrow
+          {t("editTask.postpone")}
         </button>
 
         {confirmDelete ? (
@@ -93,11 +95,11 @@ export function TaskActionSheet({
             onClick={() => run(() => onDelete(task.id))}
             className="w-full rounded-pill bg-red-500/20 py-3 text-center text-red-300 disabled:opacity-40"
           >
-            Confirm delete
+            {t("editTask.confirmDelete")}
           </button>
         ) : (
           <button onClick={() => setConfirmDelete(true)} className="w-full rounded-pill py-3 text-center text-red-400/80">
-            Delete task
+            {t("editTask.delete")}
           </button>
         )}
       </div>
