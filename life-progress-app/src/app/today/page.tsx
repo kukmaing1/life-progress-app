@@ -11,10 +11,12 @@ import { TaskActionSheet } from "@/components/TaskActionSheet";
 import { apiFetch } from "@/lib/apiClient";
 import { formatDateLong, getDateInTimezone } from "@/lib/date";
 import { computeProgress } from "@/lib/progress";
+import { useLocale } from "@/components/LocaleProvider";
 import type { Task } from "@/lib/types";
 
 export default function TodayPage() {
   const { user, loading: authLoading, error: authError } = useAuth();
+  const { t, locale } = useLocale();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
@@ -52,7 +54,7 @@ export default function TodayPage() {
     // happened. Today's own tasks need no extra confirmation: they just
     // appear in the list below.
     if (date !== getDateInTimezone(user!.timezone)) {
-      setToastMessage(`Planned for ${formatDateLong(date)}`);
+      setToastMessage(t("today.plannedFor", { date: formatDateLong(date, locale) }));
       setTimeout(() => setToastMessage(null), 4000);
     }
   }
@@ -65,7 +67,7 @@ export default function TodayPage() {
       // The optimistic update above gets corrected back to "active" by the
       // loadTasks() refetch in `finally` below — this just tells the person
       // why it reverted instead of leaving them wondering.
-      setToastError(err instanceof Error ? err.message : "Couldn't complete the task. Try again.");
+      setToastError(err instanceof Error ? err.message : t("errors.completeTaskFailed"));
       setTimeout(() => setToastError(null), 4000);
     } finally {
       loadTasks();
@@ -88,13 +90,13 @@ export default function TodayPage() {
   }
 
   if (authLoading) {
-    return <div className="flex flex-1 items-center justify-center text-cream/40">Loading...</div>;
+    return <div className="flex flex-1 items-center justify-center text-cream/40">{t("common.loading")}</div>;
   }
 
   if (authError || !user) {
     return (
       <div className="flex flex-1 items-center justify-center px-8 text-center text-cream/60">
-        {authError ?? "Sign-in required."}
+        {authError ?? t("common.signInRequired")}
       </div>
     );
   }
@@ -102,10 +104,12 @@ export default function TodayPage() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 overflow-y-auto px-6 pt-10 pb-28">
-        <h1 className="font-serif text-3xl text-cream">Today</h1>
-        <p className="mt-1 text-sm text-cream/40">{formatDateLong(getDateInTimezone(user.timezone))}</p>
+        <h1 className="font-serif text-3xl text-cream">{t("today.title")}</h1>
+        <p className="mt-1 text-sm text-cream/40">
+          {formatDateLong(getDateInTimezone(user.timezone), locale)}
+        </p>
         <p className="mt-3 text-sm text-cream/50">
-          {completedCount} / {plannedCount} completed
+          {t("today.completedOf", { completed: completedCount, planned: plannedCount })}
         </p>
         <div className="mt-3">
           <ProgressBar completed={completedCount} planned={plannedCount} />
@@ -120,9 +124,9 @@ export default function TodayPage() {
 
         <div className="mt-8">
           {loadingTasks ? (
-            <p className="py-8 text-center text-cream/30">Loading tasks...</p>
+            <p className="py-8 text-center text-cream/30">{t("today.loadingTasks")}</p>
           ) : tasks.length === 0 ? (
-            <p className="py-8 text-center text-cream/30">Nothing yet — add your first task.</p>
+            <p className="py-8 text-center text-cream/30">{t("today.empty")}</p>
           ) : (
             // `tasks` is already sorted by the server (see lib/sortTasks): scheduled
             // tasks chronologically, then anytime tasks, then completed ones. We
@@ -130,8 +134,8 @@ export default function TodayPage() {
             <>
               {scheduledTasks.length > 0 && (
                 <div className="mb-6">
-                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">Scheduled</p>
-                  <div className="divide-y divide-white/5">
+                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">{t("today.scheduled")}</p>
+                  <div className="divide-y divide-hairline">
                     {scheduledTasks.map((task) => (
                       <TaskRow key={task.id} task={task} onToggleComplete={handleToggleComplete} onOpenActions={setActiveTask} />
                     ))}
@@ -141,8 +145,8 @@ export default function TodayPage() {
 
               {anytimeTasks.length > 0 && (
                 <div className="mb-6">
-                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">Anytime</p>
-                  <div className="divide-y divide-white/5">
+                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">{t("today.anytime")}</p>
+                  <div className="divide-y divide-hairline">
                     {anytimeTasks.map((task) => (
                       <TaskRow key={task.id} task={task} onToggleComplete={handleToggleComplete} onOpenActions={setActiveTask} />
                     ))}
@@ -152,8 +156,8 @@ export default function TodayPage() {
 
               {completedTasks.length > 0 && (
                 <div>
-                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">Completed</p>
-                  <div className="divide-y divide-white/5">
+                  <p className="mb-1 text-xs font-medium uppercase tracking-[0.15em] text-cream/40">{t("today.completedSection")}</p>
+                  <div className="divide-y divide-hairline">
                     {completedTasks.map((task) => (
                       <TaskRow key={task.id} task={task} onToggleComplete={handleToggleComplete} onOpenActions={setActiveTask} />
                     ))}
@@ -168,7 +172,7 @@ export default function TodayPage() {
       <button
         onClick={() => setAddOpen(true)}
         className="fixed bottom-24 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-gold-soft to-gold text-graphite-dark shadow-glow"
-        aria-label="Add task"
+        aria-label={t("today.addTaskAria")}
       >
         <Plus size={26} />
       </button>
