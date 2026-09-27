@@ -9,6 +9,10 @@ export interface TelegramUser {
   // optional: absent if the user has no public profile photo or hides it via privacy
   // settings, so callers must handle the missing case (initials avatar), never assume it.
   photo_url?: string;
+  // The device's Telegram client language (IETF tag, e.g. "ru", "pt-BR") —
+  // used once, at signup, to pick a starting UI language via normalizeLocale.
+  // Optional: older clients or unusual configurations may omit it.
+  language_code?: string;
 }
 
 export interface ValidatedInitData {
