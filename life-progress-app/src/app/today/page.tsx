@@ -20,6 +20,7 @@ export default function TodayPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [toastError, setToastError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const loadTasks = useCallback(async () => {
     setLoadingTasks(true);
@@ -43,9 +44,17 @@ export default function TodayPage() {
   const anytimeTasks = tasks.filter((t) => t.status === "active" && t.scheduled_time === null);
   const completedTasks = tasks.filter((t) => t.status === "completed");
 
-  async function handleCreate(title: string, time: string | null) {
-    await apiFetch("/api/tasks", { method: "POST", body: JSON.stringify({ title, time }) });
+  async function handleCreate(title: string, time: string | null, date: string) {
+    await apiFetch("/api/tasks", { method: "POST", body: JSON.stringify({ title, time, date }) });
     await loadTasks();
+    // A future-dated task won't show up in this list (it belongs to that
+    // day, not today) — without this, saving it would look like nothing
+    // happened. Today's own tasks need no extra confirmation: they just
+    // appear in the list below.
+    if (date !== getDateInTimezone(user!.timezone)) {
+      setToastMessage(`Planned for ${formatDateLong(date)}`);
+      setTimeout(() => setToastMessage(null), 4000);
+    }
   }
 
   async function handleToggleComplete(task: Task) {
@@ -105,6 +114,9 @@ export default function TodayPage() {
         {toastError && (
           <p className="mt-4 rounded-xl bg-red-500/10 px-4 py-2.5 text-sm text-red-300">{toastError}</p>
         )}
+        {toastMessage && (
+          <p className="mt-4 rounded-xl bg-gold/10 px-4 py-2.5 text-sm text-gold">{toastMessage}</p>
+        )}
 
         <div className="mt-8">
           {loadingTasks ? (
@@ -163,7 +175,12 @@ export default function TodayPage() {
 
       <BottomNav />
 
-      <AddTaskSheet open={addOpen} onClose={() => setAddOpen(false)} onCreate={handleCreate} />
+      <AddTaskSheet
+        open={addOpen}
+        todayDate={getDateInTimezone(user.timezone)}
+        onClose={() => setAddOpen(false)}
+        onCreate={handleCreate}
+      />
       <TaskActionSheet
         key={activeTask?.id ?? "none"}
         task={activeTask}
