@@ -122,7 +122,7 @@ export default function ProgressPage() {
                 key={date}
                 onClick={() => setSelectedDate(date)}
                 className={`flex flex-col items-center gap-1 rounded-xl py-2 ${
-                  isSelected ? "bg-white/10" : ""
+                  isSelected ? "bg-track" : ""
                 }`}
               >
                 <span className="text-sm text-cream/80">{dayNum}</span>
@@ -132,7 +132,7 @@ export default function ProgressPage() {
           })}
         </div>
 
-        <div className="mt-8 border-t border-white/5 pt-6">
+        <div className="mt-8 border-t border-hairline pt-6">
           <p className="mb-2 text-sm text-cream/50">{selectedDate ? formatDateLong(selectedDate) : ""}</p>
 
           {dayLoading ? (
@@ -140,7 +140,7 @@ export default function ProgressPage() {
           ) : !dayTasks || dayTasks.length === 0 ? (
             <p className="py-6 text-center text-cream/30">Nothing planned that day.</p>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-hairline">
               {dayTasks.map((task) => (
                 <div key={task.id} className="flex items-center gap-3 py-3">
                   <span
