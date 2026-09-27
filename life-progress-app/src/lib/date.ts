@@ -1,3 +1,5 @@
+import { LOCALE_TAG, type Locale } from "./locale";
+
 /**
  * Timezone helpers. Tasks and "Today" must always be resolved using the
  * user's stored timezone, never the server's — see spec section 20.
@@ -51,10 +53,15 @@ export function isValidMonthString(value: string): boolean {
  * reasoning as the calendar grid helpers below: the input is always a plain
  * "YYYY-MM-DD" string that's already been resolved against the right
  * timezone upstream, so formatting it must not re-apply the browser's own.
+ *
+ * `locale` picks the real BCP-47 tag Intl formats with (see LOCALE_TAG) —
+ * weekday/month names come from Intl itself rather than a hand-translated
+ * word list, so they're always grammatically correct native forms, not a
+ * word-for-word substitution that could come out mangled.
  */
-export function formatDateLong(date: string): string {
+export function formatDateLong(date: string, locale: Locale = "en"): string {
   const [y, m, d] = date.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(LOCALE_TAG[locale], {
     weekday: "long",
     month: "long",
     day: "numeric",
@@ -63,12 +70,45 @@ export function formatDateLong(date: string): string {
 }
 
 /** "Mon", "Tue", ... — short weekday label for a "YYYY-MM-DD" string, UTC-parsed for the same reason as formatDateLong above. */
-export function formatWeekdayShort(date: string): string {
+export function formatWeekdayShort(date: string, locale: Locale = "en"): string {
   const [y, m, d] = date.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(LOCALE_TAG[locale], {
     weekday: "short",
     timeZone: "UTC",
   });
+}
+
+/**
+ * "September 2026" — the Progress calendar header's month/year label.
+ * Locale-aware the same way formatDateLong is (real Intl formatting, not a
+ * translated word list) — this replaces a previously hardcoded "en-US" call
+ * that ignored the user's language entirely.
+ */
+export function formatMonthYear(month: string, locale: Locale = "en"): string {
+  const [y, m] = month.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString(LOCALE_TAG[locale], {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+/**
+ * Mon..Sun short weekday labels in the given language, for the Progress
+ * calendar grid's header row (previously a hardcoded English array). Formats
+ * off a fixed, arbitrary Monday (Jan 1, 2024) purely as an anchor — the
+ * point is just "what does Intl call this weekday here", not that date
+ * itself, so the result is always exactly 7 labels starting from Monday.
+ */
+export function getWeekdayLabels(locale: Locale = "en"): string[] {
+  const anchorMonday = Date.UTC(2024, 0, 1);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Array.from({ length: 7 }, (_, i) =>
+    new Date(anchorMonday + i * msPerDay).toLocaleDateString(LOCALE_TAG[locale], {
+      weekday: "short",
+      timeZone: "UTC",
+    })
+  );
 }
 
 /**
