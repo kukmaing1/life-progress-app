@@ -62,13 +62,13 @@ export function TaskActionSheet({
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mb-3 w-full rounded-xl bg-black/20 px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
+          className="mb-3 w-full rounded-xl bg-field px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
         />
         <input
           type="time"
           value={time ?? ""}
           onChange={(e) => setTime(e.target.value)}
-          className="mb-5 w-full rounded-xl bg-black/20 px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
+          className="mb-5 w-full rounded-xl bg-field px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
         />
 
         <button
@@ -82,7 +82,7 @@ export function TaskActionSheet({
         <button
           disabled={busy}
           onClick={() => run(() => onPostpone(task.id))}
-          className="mb-2 w-full rounded-pill border border-white/10 py-3 text-center text-cream/80 disabled:opacity-40"
+          className="mb-2 w-full rounded-pill border border-hairline-strong py-3 text-center text-cream/80 disabled:opacity-40"
         >
           Postpone to tomorrow
         </button>
