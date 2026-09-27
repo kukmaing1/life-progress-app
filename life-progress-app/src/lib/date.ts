@@ -142,3 +142,18 @@ export function addMonths(month: string, delta: number): string {
 export function isValidTimeString(value: string): boolean {
   return /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
 }
+
+/**
+ * Whole days between two "YYYY-MM-DD" strings (`today` minus `from`), for
+ * the Profile page's "Day {n}" counter — `from` is the person's join date
+ * (their account's created_at, already resolved to their timezone), `today`
+ * is "today" in that same timezone. UTC-parsed, same reasoning as the rest
+ * of this file: both inputs are already-resolved plain date strings, not
+ * browser-local Dates.
+ */
+export function daysSince(from: string, today: string): number {
+  const [y1, m1, d1] = from.split("-").map(Number);
+  const [y2, m2, d2] = today.split("-").map(Number);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / msPerDay);
+}
