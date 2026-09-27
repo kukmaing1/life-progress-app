@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { isValidTimezone } from "@/lib/date";
+import { SUPPORTED_LOCALES, type Locale } from "@/lib/locale";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -13,7 +14,7 @@ export async function PATCH(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let body: { timezone?: string; notifications_enabled?: boolean; theme?: string };
+  let body: { timezone?: string; notifications_enabled?: boolean; theme?: string; locale?: string };
   try {
     body = await req.json();
   } catch {
@@ -46,6 +47,14 @@ export async function PATCH(req: NextRequest) {
     }
     updates.push(`theme = $${idx++}`);
     values.push(body.theme);
+  }
+
+  if (body.locale !== undefined) {
+    if (typeof body.locale !== "string" || !SUPPORTED_LOCALES.includes(body.locale as Locale)) {
+      return NextResponse.json({ error: "Invalid locale" }, { status: 400 });
+    }
+    updates.push(`locale = $${idx++}`);
+    values.push(body.locale);
   }
 
   if (updates.length === 0) {
