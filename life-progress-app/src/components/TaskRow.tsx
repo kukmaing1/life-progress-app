@@ -21,7 +21,7 @@ export function TaskRow({
         onClick={() => !completed && onToggleComplete(task)}
         disabled={completed}
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors ${
-          completed ? "border-gold/40 bg-gold/10 text-gold" : "border-cream/30 text-transparent active:bg-white/5"
+          completed ? "border-gold/40 bg-gold/10 text-gold" : "border-cream/30 text-transparent active:bg-pressed"
         }`}
       >
         <Check size={14} strokeWidth={2.5} />
