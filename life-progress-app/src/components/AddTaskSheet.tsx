@@ -75,7 +75,7 @@ export function AddTaskSheet({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Task title"
-          className="mb-3 w-full rounded-xl bg-black/20 px-4 py-3 text-cream placeholder:text-cream/30 focus:outline-none focus:ring-1 focus:ring-gold/50"
+          className="mb-3 w-full rounded-xl bg-field px-4 py-3 text-cream placeholder:text-cream/30 focus:outline-none focus:ring-1 focus:ring-gold/50"
           onKeyDown={(e) => e.key === "Enter" && handleSave()}
         />
 
@@ -90,7 +90,7 @@ export function AddTaskSheet({
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          className="mb-3 h-12 w-full appearance-none rounded-xl bg-black/20 px-4 text-center text-cream focus:outline-none focus:ring-1 focus:ring-gold/50 [color-scheme:dark]"
+          className="mb-3 h-12 w-full appearance-none rounded-xl bg-field px-4 text-center text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
         />
 
         {/* Planning ahead is a secondary, optional step — most tasks are still
@@ -103,7 +103,7 @@ export function AddTaskSheet({
             type="button"
             onClick={() => setDate(todayDate)}
             className={`flex h-12 flex-1 items-center justify-center rounded-xl text-sm transition-colors ${
-              date === todayDate ? "bg-gold/20 text-gold" : "bg-black/20 text-cream/50"
+              date === todayDate ? "bg-gold/20 text-gold" : "bg-field text-cream/50"
             }`}
           >
             Today
@@ -112,7 +112,7 @@ export function AddTaskSheet({
             type="button"
             onClick={() => setDate(tomorrow)}
             className={`flex h-12 flex-1 items-center justify-center rounded-xl text-sm transition-colors ${
-              date === tomorrow ? "bg-gold/20 text-gold" : "bg-black/20 text-cream/50"
+              date === tomorrow ? "bg-gold/20 text-gold" : "bg-field text-cream/50"
             }`}
           >
             Tomorrow
@@ -125,7 +125,7 @@ export function AddTaskSheet({
           min={todayDate}
           onChange={(e) => setDate(e.target.value)}
           aria-label="Task date"
-          className="mb-5 h-12 w-full appearance-none rounded-xl bg-black/20 px-4 text-center text-cream focus:outline-none focus:ring-1 focus:ring-gold/50 [color-scheme:dark]"
+          className="mb-5 h-12 w-full appearance-none rounded-xl bg-field px-4 text-center text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
         />
 
         <button
