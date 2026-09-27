@@ -7,7 +7,7 @@ export function ProgressBar({ completed, planned }: { completed: number; planned
         <div
           key={i}
           className={`h-1.5 flex-1 rounded-pill transition-colors ${
-            i < completed ? "bg-gold shadow-glow" : "bg-white/10"
+            i < completed ? "bg-gold shadow-glow" : "bg-track"
           }`}
         />
       ))}
