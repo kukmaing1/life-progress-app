@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { addDaysToDateString } from "@/lib/date";
+import { useLocale } from "@/components/LocaleProvider";
 
 export function AddTaskSheet({
   open,
@@ -17,6 +18,7 @@ export function AddTaskSheet({
   onClose: () => void;
   onCreate: (title: string, time: string | null, date: string) => Promise<void>;
 }) {
+  const { t } = useLocale();
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("");
   const [date, setDate] = useState(todayDate);
@@ -42,7 +44,7 @@ export function AddTaskSheet({
       // explanation (looked like "nothing happens" / "doesn't save"). Now the
       // person actually sees why, and their typed title/time are kept so they
       // don't have to retype anything to try again.
-      setError(err instanceof Error ? err.message : "Couldn't save the task. Try again.");
+      setError(err instanceof Error ? err.message : t("errors.saveTaskFailed"));
     } finally {
       setSaving(false);
     }
@@ -60,8 +62,8 @@ export function AddTaskSheet({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-serif text-lg text-cream">New task</h2>
-          <button onClick={handleClose} className="text-cream/50" aria-label="Close">
+          <h2 className="font-serif text-lg text-cream">{t("addTask.heading")}</h2>
+          <button onClick={handleClose} className="text-cream/50" aria-label={t("addTask.closeAria")}>
             <X size={20} />
           </button>
         </div>
@@ -74,7 +76,7 @@ export function AddTaskSheet({
           autoFocus
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Task title"
+          placeholder={t("addTask.titlePlaceholder")}
           className="mb-3 w-full rounded-xl bg-field px-4 py-3 text-cream placeholder:text-cream/30 focus:outline-none focus:ring-1 focus:ring-gold/50"
           onKeyDown={(e) => e.key === "Enter" && handleSave()}
         />
@@ -106,7 +108,7 @@ export function AddTaskSheet({
               date === todayDate ? "bg-gold/20 text-gold" : "bg-field text-cream/50"
             }`}
           >
-            Today
+            {t("addTask.today")}
           </button>
           <button
             type="button"
@@ -115,7 +117,7 @@ export function AddTaskSheet({
               date === tomorrow ? "bg-gold/20 text-gold" : "bg-field text-cream/50"
             }`}
           >
-            Tomorrow
+            {t("addTask.tomorrow")}
           </button>
         </div>
 
@@ -124,7 +126,7 @@ export function AddTaskSheet({
           value={date}
           min={todayDate}
           onChange={(e) => setDate(e.target.value)}
-          aria-label="Task date"
+          aria-label={t("addTask.dateAria")}
           className="mb-5 h-12 w-full appearance-none rounded-xl bg-field px-4 text-center text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
         />
 
@@ -133,7 +135,7 @@ export function AddTaskSheet({
           disabled={!title.trim() || saving}
           className="w-full rounded-pill bg-gradient-to-r from-gold-soft to-gold py-3.5 text-center font-medium text-graphite-dark disabled:opacity-40"
         >
-          {saving ? "Saving..." : date === todayDate ? "Add task" : "Plan task"}
+          {saving ? t("addTask.saving") : date === todayDate ? t("addTask.addButton") : t("addTask.planButton")}
         </button>
       </div>
     </div>
