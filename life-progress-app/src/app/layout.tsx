@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider, ThemeSync } from "@/components/ThemeProvider";
+import { LocaleProvider, LocaleSync } from "@/components/LocaleProvider";
 
 // Runs synchronously while the HTML is still being parsed, before the first
 // paint and before React hydrates — reads the last theme this browser saved
@@ -41,12 +42,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-graphite font-sans text-cream antialiased">
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
-        <ThemeProvider>
-          <AuthProvider>
-            <ThemeSync />
-            <div className="mx-auto flex min-h-screen max-w-md flex-col">{children}</div>
-          </AuthProvider>
-        </ThemeProvider>
+        <LocaleProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <ThemeSync />
+              <LocaleSync />
+              <div className="mx-auto flex min-h-screen max-w-md flex-col">{children}</div>
+            </AuthProvider>
+          </ThemeProvider>
+        </LocaleProvider>
       </body>
     </html>
   );
