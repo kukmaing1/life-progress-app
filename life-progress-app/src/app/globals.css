@@ -38,25 +38,30 @@
  * gold-soft/gold-muted are deepened, not just reused, because the original
  * paler tones read fine on a near-black page but fall well below readable
  * contrast as text on a light one.
+ *
+ * Deliberately never goes near white (255 255 255) anywhere — a milky/beige
+ * ceiling instead, since a stark white surface behind gold accents was too
+ * harsh/glary. graphite-light (sheets, the most "elevated" surface) is the
+ * closest thing to a ceiling here, and it still stays a warm off-white.
  */
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --color-graphite: 251 248 242;
-  --color-graphite-light: 255 255 255;
+  --color-graphite: 240 232 214;
+  --color-graphite-light: 246 240 226;
   --color-cream: 43 38 32;
 
   --color-gold: 184 130 58;
   --color-gold-soft: 209 166 104;
   --color-gold-muted: 138 102 51;
 
-  --color-hairline: 232 226 213;
-  --color-hairline-strong: 217 210 192;
-  --color-field: 239 233 220;
-  --color-track: 228 222 208;
-  --color-pressed: 236 229 214;
+  --color-hairline: 220 210 186;
+  --color-hairline-strong: 204 191 160;
+  --color-field: 231 221 198;
+  --color-track: 224 213 186;
+  --color-pressed: 228 218 196;
 
-  --page-gradient: radial-gradient(120% 60% at 50% 0%, #fffdf8 0%, #f8f3e8 60%, #f5efe1 100%);
+  --page-gradient: radial-gradient(120% 60% at 50% 0%, #f2ead8 0%, #ece1c9 60%, #e6d9bc 100%);
 }
 
 html,
