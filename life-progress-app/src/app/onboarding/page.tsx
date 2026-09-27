@@ -4,9 +4,11 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppIntro } from "@/components/AppIntro";
 import { StepsIllustration } from "@/components/StepsIllustration";
+import { useLocale } from "@/components/LocaleProvider";
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { t } = useLocale();
 
   useEffect(() => {
     fetch("/api/events", {
@@ -38,7 +40,7 @@ export default function OnboardingPage() {
         onClick={handleGetStarted}
         className="w-full max-w-xs rounded-pill bg-gradient-to-r from-gold-soft to-gold py-4 font-medium text-graphite-dark shadow-glow"
       >
-        Get started
+        {t("onboarding.getStarted")}
       </button>
     </div>
   );
