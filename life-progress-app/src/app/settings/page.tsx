@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Moon, Sun } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { BottomNav } from "@/components/BottomNav";
+import { useTheme, type Theme } from "@/components/ThemeProvider";
 import { apiFetch } from "@/lib/apiClient";
 
 const APP_VERSION = "1.0.0";
 
 export default function SettingsPage() {
   const { user, loading, refreshUser } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [timezone, setTimezone] = useState("UTC");
   const [notifications, setNotifications] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -36,6 +38,23 @@ export default function SettingsPage() {
     try {
       await apiFetch("/api/me", { method: "PATCH", body: JSON.stringify(patch) });
       await refreshUser();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleThemeChange(next: Theme) {
+    if (next === theme) return;
+    const previous = theme;
+    setTheme(next); // instant — repaints immediately, no waiting on the network
+    setSaving(true);
+    try {
+      await apiFetch("/api/me", { method: "PATCH", body: JSON.stringify({ theme: next }) });
+      await refreshUser();
+    } catch {
+      // The save failed — don't leave the UI claiming a preference that
+      // never actually persisted (it would silently revert on next open).
+      setTheme(previous);
     } finally {
       setSaving(false);
     }
@@ -75,7 +94,7 @@ export default function SettingsPage() {
                 setNotifications(next);
                 updateSetting({ notifications_enabled: next });
               }}
-              className={`h-7 w-12 rounded-pill transition-colors ${notifications ? "bg-gold" : "bg-white/10"}`}
+              className={`h-7 w-12 rounded-pill transition-colors ${notifications ? "bg-gold" : "bg-track"}`}
               aria-label="Toggle notifications"
             >
               <span
@@ -84,6 +103,37 @@ export default function SettingsPage() {
                 }`}
               />
             </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-cream">Appearance</p>
+              <p className="text-sm text-cream/40">Dark or light theme</p>
+            </div>
+            <div className="flex gap-1 rounded-pill bg-field p-1">
+              <button
+                disabled={saving}
+                onClick={() => handleThemeChange("dark")}
+                aria-label="Dark theme"
+                aria-pressed={theme === "dark"}
+                className={`flex h-8 w-8 items-center justify-center rounded-pill transition-colors ${
+                  theme === "dark" ? "bg-gold text-graphite-dark" : "text-cream/40"
+                }`}
+              >
+                <Moon size={16} />
+              </button>
+              <button
+                disabled={saving}
+                onClick={() => handleThemeChange("light")}
+                aria-label="Light theme"
+                aria-pressed={theme === "light"}
+                className={`flex h-8 w-8 items-center justify-center rounded-pill transition-colors ${
+                  theme === "light" ? "bg-gold text-graphite-dark" : "text-cream/40"
+                }`}
+              >
+                <Sun size={16} />
+              </button>
+            </div>
           </div>
 
           <div>
@@ -95,7 +145,7 @@ export default function SettingsPage() {
                 setTimezone(e.target.value);
                 updateSetting({ timezone: e.target.value });
               }}
-              className="w-full rounded-xl bg-black/20 px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
+              className="w-full rounded-xl bg-field px-4 py-3 text-cream focus:outline-none focus:ring-1 focus:ring-gold/50"
             >
               {timezones.map((tz) => (
                 <option key={tz} value={tz}>
@@ -105,7 +155,7 @@ export default function SettingsPage() {
             </select>
           </div>
 
-          <div className="border-t border-white/5 pt-6">
+          <div className="border-t border-hairline pt-6">
             <p className="text-cream">Telegram account</p>
             <p className="mt-1 text-sm text-cream/50">
               {user.first_name} {user.last_name ?? ""}
@@ -113,7 +163,7 @@ export default function SettingsPage() {
             </p>
           </div>
 
-          <div className="border-t border-white/5 pt-6">
+          <div className="border-t border-hairline pt-6">
             <p className="text-sm text-cream/30">Life Progress v{APP_VERSION}</p>
           </div>
         </div>
