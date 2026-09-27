@@ -87,14 +87,14 @@ export function ProfileHeader({ user }: { user: User }) {
       {user.username && <p className="mt-0.5 text-sm text-cream/40">@{user.username}</p>}
 
       <div className="mt-6 grid w-full grid-cols-2 gap-3">
-        <div className="rounded-card border border-white/5 bg-white/[0.03] py-4">
+        <div className="rounded-card border border-hairline bg-graphite py-4">
           <div className="flex items-center justify-center gap-1.5">
             <Flame size={18} className={stats && stats.streak > 0 ? "text-gold" : "text-cream/30"} />
             <span className="font-serif text-2xl text-cream">{stats ? stats.streak : "…"}</span>
           </div>
           <p className="mt-1 text-xs uppercase tracking-[0.1em] text-cream/40">Day streak</p>
         </div>
-        <div className="rounded-card border border-white/5 bg-white/[0.03] py-4">
+        <div className="rounded-card border border-hairline bg-graphite py-4">
           <div className="flex items-center justify-center gap-1.5">
             <CheckCircle2 size={18} className="text-gold" />
             <span className="font-serif text-2xl text-cream">{stats ? stats.totalCompleted : "…"}</span>
@@ -105,7 +105,7 @@ export function ProfileHeader({ user }: { user: User }) {
 
       <Link
         href="/progress"
-        className="mt-3 block w-full rounded-card border border-white/5 bg-white/[0.03] px-4 py-4 text-left active:bg-white/[0.06]"
+        className="mt-3 block w-full rounded-card border border-hairline bg-graphite px-4 py-4 text-left active:bg-graphite-light"
       >
         <div className="flex items-center justify-between text-cream/50">
           <span className="text-xs font-medium uppercase tracking-[0.1em]">This week</span>
