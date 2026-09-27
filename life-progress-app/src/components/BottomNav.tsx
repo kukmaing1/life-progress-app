@@ -22,7 +22,7 @@ export function BottomNav() {
   const [comingSoon, setComingSoon] = useState<string | null>(null);
 
   return (
-    <nav className="sticky bottom-0 border-t border-white/5 bg-graphite/95 px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-2 backdrop-blur">
+    <nav className="sticky bottom-0 border-t border-hairline bg-graphite/95 px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-2 backdrop-blur">
       {comingSoon && (
         <p className="pb-2 text-center text-xs text-cream/50">{comingSoon} — coming soon</p>
       )}
